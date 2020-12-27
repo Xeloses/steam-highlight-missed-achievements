@@ -122,14 +122,23 @@
 
                                 if(missed_achievements.length)
                                 {
-                                    $log('Achievements for "' + game_title + '" loaded successful. Found ' + missed_achievements.length + ' missed achievements:',LOG_INFO);
+                                    $log('Achievements for "' + game_title + '" loaded successful. Found ' + missed_achievements.length + ' missed achievements.',LOG_INFO);
 
                                     // add higlighting to missed achievements:
                                     let $guide = $J('#profileBlock .guide'),
-                                        guide = $guide.html();
+                                        guide = $guide.html(),
+                                        _r = null, _term = '';
+
+                                    // achievement searching RegExp template:
+                                    const _r_tpl = '(?:[^\\w\\>]|\\<[\\w]*?\\>|[\\w]*?[\\"\\\']\\>|^)(%TERM%)(?:[^\\w\\<]|\\<[\\/]?[\\w]*?\\>|$)';
 
                                     missed_achievements.forEach((item)=>{
-                                        guide = guide.replace(new RegExp('(?:[^\\w\\-\\>]|\\<[\\w]\\>|^)(' + item.replace(/\'\"\/\\\!\?\:\@\#\$\%\^\&\*\(\)\{\}\[\]\<\>\.\,\|\-\+/g, (s)=>{ return '\\'+s; }) + ')(?:[^\\w\\-\\<]|\\<\\/[\\w]\\>|$)', 'gi'), '<span class="missed_achievement highlight">' + item + '</span>');
+                                        // escape symbols in achievement name:
+                                        _term = item.replace(/\'\"\/\\\!\?\:\@\#\$\%\^\&\*\(\)\{\}\[\]\<\>\.\,\|\-\+/g, s => '\\'+s);
+                                        // create achievement searching RegExp:
+                                        _r = new RegExp(_r_tpl.replace('%TERM%', _term),'gi');
+                                        // add highlight to achievement mentions:
+                                        guide = guide.replace(_r, s => s.replace(item, '<span class="missed_achievement highlight">' + item + '</span>'));
                                     });
 
                                     $guide.html(guide);
