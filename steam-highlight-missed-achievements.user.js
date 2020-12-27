@@ -6,8 +6,8 @@
 // @license      MIT
 // @namespace    Xeloses.Steam.HighlightMissedAchievements
 // @match        https://steamcommunity.com/sharedfiles/filedetails/?id=*
-// @updateURL    https://github.com/Xeloses/steam-highlight-missed-achievements/raw/master/steam-highlight-missed-achievements.user.js
-// @downloadURL  https://github.com/Xeloses/steam-highlight-missed-achievements/raw/master/steam-highlight-missed-achievements.user.js
+// @updateURL    https://raw.githubusercontent.com/Xeloses/steam-highlight-missed-achievements/master/steam-highlight-missed-achievements.user.js
+// @downloadURL  https://raw.githubusercontent.com/Xeloses/steam-highlight-missed-achievements/master/steam-highlight-missed-achievements.user.js
 // @grant        GM_xmlhttpRequest
 // @grant        GM.xmlhttpRequest
 // @connect      https://steamcommunity.com
