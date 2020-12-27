@@ -12,4 +12,4 @@ Highlight missed achievements in Steam achievements/walkthrough guides.
     * **Opera**: [install](https://addons.opera.com/en/extensions/details/tampermonkey-beta/)
     * **Safari** (MacOS): [install](https://apps.apple.com/us/app/tampermonkey/id1482490089)
     * **IE/Edge**: *no support (using these applications is strongly not recommended)*
-2. Install userscript: [install](https://github.com/Xeloses/steam-highlight-missed-achievements/raw/master/steam-highlight-missed-achievements.user.js)
+2. Install userscript: [install](https://raw.githubusercontent.com/Xeloses/steam-highlight-missed-achievements/master/steam-highlight-missed-achievements.user.js)
