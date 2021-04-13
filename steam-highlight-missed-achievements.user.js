@@ -3,7 +3,7 @@
 // @description  Highlight missed achievements in Steam guides.
 // @author       Xeloses
 // @version      1.0.0
-// @license      MIT
+// @license      GPL-3.0 (https://www.gnu.org/licenses/gpl-3.0.html)
 // @namespace    Xeloses.Steam.HighlightMissedAchievements
 // @match        https://steamcommunity.com/sharedfiles/filedetails/?id=*
 // @updateURL    https://raw.githubusercontent.com/Xeloses/steam-highlight-missed-achievements/master/steam-highlight-missed-achievements.user.js
@@ -64,23 +64,10 @@
     let missed_achievements = null;
 
     /*
-     * @const Enable/disable status & error output to console
+     * @class Log
      */
-    const ENABLE_CONSOLE_OUTPUT = true;
-
-    /*
-     * @const Console message type
-     */
-    const LOG_INFO  = 1;
-    const LOG_WARN  = 2;
-    const LOG_ERROR = 3;
-
-    /*
-     * Console output
-     *
-     * @return {Void}
-     */
-    function $log(msg,level=null){if(!ENABLE_CONSOLE_OUTPUT||!msg){return}let t='%c[Xeloses` Achievements Highlighting]%c '+msg,hStyle='color:#c5c;font-weight:bold;',tStyle='color:#ddd;font-weight:normal;';switch(level){case LOG_INFO:console.info(t,hStyle,tStyle+'font-style:italic;');break;case LOG_WARN:console.warn(t,hStyle,tStyle);break;case LOG_ERROR:console.error(t,hStyle,tStyle);break;default:console.log(t,hStyle,tStyle);break}}
+    class XelLog{constructor(){let d=GM_info.script;this.author=d.author;this.app=d.name;this.ns=d.namespace;this.version=d.version;this.h='color:#c5c;font-weight:bold;';this.t='color:#ddd;font-weight:normal;';}log(s){console.log('%c['+this.app+']%c '+s,this.h,this.t)}info(s){console.info('%c['+this.app+']%c '+s,this.h,this.t+'font-style:italic;')}warn(s){console.warn('%c['+this.app+']%c '+s,this.h,this.t)}error(s){console.error('%c['+this.app+']%c '+s,this.h,this.t)}dump(v){console.log(v)}}
+    const $log = new XelLog();
 
     /*
      * Get achievements list
@@ -122,7 +109,7 @@
 
                                 if(missed_achievements.length)
                                 {
-                                    $log('Achievements for "' + game_title + '" loaded successful. Found ' + missed_achievements.length + ' missed achievements.',LOG_INFO);
+                                    $log.info('Achievements for "' + game_title + '" loaded successful. Found ' + missed_achievements.length + ' missed achievements.');
 
                                     // add higlighting to missed achievements:
                                     let $guide = $J('#profileBlock .guide'),
@@ -130,54 +117,54 @@
                                         _r = null, _term = '';
 
                                     // achievement searching RegExp template:
-                                    const _r_tpl = '(?:[^\\w\\>]|\\<[\\w]*?\\>|[\\w]*?[\\"\\\']\\>|^)(%TERM%)(?:[^\\w\\<]|\\<[\\/]?[\\w]*?\\>|$)';
+                                    const _r_tpl = '(?:[^\\w\\>]|\\<[\\w]*?\\>|[\\w]*?[\\"\\\']\\>|^)([\\s]*?%TERM%[\\s]*?)(?:[^\\w\\<]|\\<[\\/]?[\\w]*?\\>|$)';
 
                                     missed_achievements.forEach((item)=>{
-                                        // escape symbols in achievement name:
-                                        _term = item.replace(/\'\"\/\\\!\?\:\@\#\$\%\^\&\*\(\)\{\}\[\]\<\>\.\,\|\-\+/g, s => '\\'+s);
+                                        // remove symbols from the end of achievement name (in guides those symbols can be missed) & escape other symbols:
+                                        _term = item.replace(/[^A-Za-zА-Яа-я0-9]+$/, '').replace(/\'\"\/\\\!\?\:\@\#\$\%\^\&\*\(\)\{\}\[\]\<\>\.\,\|\-\+/g, s => '\\'+s);
                                         // create achievement searching RegExp:
                                         _r = new RegExp(_r_tpl.replace('%TERM%', _term),'gi');
                                         // add highlight to achievement mentions:
-                                        guide = guide.replace(_r, s => s.replace(item, '<span class="missed_achievement highlight">' + item + '</span>'));
+                                        guide = guide.replace(_r, s => s.replace(_term, '<span class="missed_achievement highlight">' + item + '</span>'));
                                     });
 
                                     $guide.html(guide);
 
                                     // unblock highlight controls:
-                                    $frm.find('label').attr('title','Found ' + missed_achievements.length + ' missed achievements:' + missed_achievements.map((item)=>{ return '\n    - "' + item + '"' }).join()).text('Highlight missed achievements');
+                                    $frm.find('label').attr('title','Found ' + missed_achievements.length + ' missed achievements:' + missed_achievements.map(item => '\n    - "' + item + '"').join()).text('Highlight missed achievements');
                                     $frm.prop('disabled',false);
                                 }
                                 else
                                 {
-                                    $log('Achievements for "' + game_title + '" loaded successful. No missed achievements found.',LOG_INFO);
+                                    $log.info('Achievements for "' + game_title + '" loaded successful. No missed achievements found.');
                                     $frm.find('label').text('No missed achievements found');
                                 }
                                 return;
                             }
                             else
                             {
-                                $log('Error loading user\'s achievements for "' + game_title + '" - empty data recieved.',LOG_ERROR);
+                                $log.error('Error loading user\'s achievements for "' + game_title + '" - empty data recieved.');
                             }
                         }
                         else
                         {
-                            $log('Error loading user\'s achievements for "' + game_title + '" - bad data recieved.',LOG_ERROR);
+                            $log.error('Error loading user\'s achievements for "' + game_title + '" - bad data recieved.');
                         }
                     }
                     else
                     {
-                        $log('Error loading user\'s achievements for "' + game_title + '" - no data recieved.',LOG_ERROR);
+                        $log.error('Error loading user\'s achievements for "' + game_title + '" - no data recieved.');
                     }
                 }
                 else
                 {
-                    $log('Error '+(response.status?'('+response.status+')':'')+': could not retrieve data from Steam.',LOG_ERROR);
+                    $log.error('Error '+(response.status?'('+response.status+')':'')+': could not retrieve data from Steam.');
                 }
                 $frm.find('label').addClass('error').text('Error attempt to load achievements list');
                 $frm.find('input[type="checkbox"]').prop('checked',false);
             },
             onerror: function(response){
-                $log('Error: request error.',LOG_ERROR);
+                $log.error('Error: request error.');
                 $frm.find('label').addClass('error').text('Request error. Reload page or try again later.');
                 $frm.find('input').css('display','none');
             }
@@ -289,14 +276,15 @@
         {
             // get game ID:
             game_id = getGameID();
+            if(!game_id) return;
 
             // get user name:
             username = getUsername();
+            if(!username) return;
 
             // get game title:
             game_title = $J('.apphub_HomeHeaderContent .apphub_AppName').text();
-
-            if(!game_id || !game_title || !username) return;
+            if(!game_title) return;
 
             // add highlighting control:
             renderForm();
